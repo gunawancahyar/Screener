@@ -550,7 +550,7 @@ const NAV = [
   { id: "valuasi", label: "Valuasi", icon: Calculator },
   { id: "riwayat", label: "Riwayat Analisa", icon: History },
 ];
-
+      }
 const PIE_COLORS = ["#34d399", "#10b981", "#059669", "#047857", "#065f46", "#a3e635"];
 
 export default function ScreenerPage() {
