@@ -1,5 +1,6 @@
 'use client';
 
+// 1. SEMUA IMPORT DI ATAS
 import React, { useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
 import {
@@ -9,7 +10,7 @@ import {
 } from "lucide-react";
 import * as XLSX from "xlsx";
 
-// Dynamic Import Recharts agar aman dari error SSR saat build Vercel
+// Dynamic Import Recharts (Agar aman dari SSR)
 const ResponsiveContainer = dynamic(() => import("recharts").then(m => m.ResponsiveContainer), { ssr: false });
 const RadarChart = dynamic(() => import("recharts").then(m => m.RadarChart), { ssr: false });
 const PolarGrid = dynamic(() => import("recharts").then(m => m.PolarGrid), { ssr: false });
@@ -31,8 +32,36 @@ const LineChart = dynamic(() => import("recharts").then(m => m.LineChart), { ssr
 const Line = dynamic(() => import("recharts").then(m => m.Line), { ssr: false });
 const Legend = dynamic(() => import("recharts").then(m => m.Legend), { ssr: false });
 
-// --- DI SINI BARU MASUKKAN KOMPONEN UTAMA (export default function App() { ... }) ---
 
+// 2. MASUK KE DALAM KOMPONEN UTAMA
+export default function ScreenerPage() {
+  // Masukkan useState isMounted DI DALAM FUNGSI SINI
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // State aplikasi Anda yang lain (contoh):
+  // const [activeTab, setActiveTab] = useState("dashboard");
+  // const [stocks, setStocks] = useState([...]);
+
+  // Pengecekan Mounted JUGA DI DALAM FUNGSI SINI (sebelum return JSX utama)
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen bg-zinc-950 text-emerald-400 flex items-center justify-center font-mono">
+        Loading Fundamental Screener...
+      </div>
+    );
+  }
+
+  // JSX Utama Komponen Anda
+  return (
+    <div className="min-h-screen bg-zinc-950 text-white p-6">
+      {/* Seluruh Tampilan Dashboard / Screener Anda */}
+    </div>
+  );
+}
 // Di dalam komponen App() Anda:
 const [isMounted, setIsMounted] = useState(false);
 
