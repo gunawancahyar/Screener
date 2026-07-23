@@ -613,7 +613,7 @@ export default function ScreenerPage() {
       },
       ...h,
     ]);
-  
+  }
 
   // D. HYDRATION GUARD
   if (!isMounted) {
@@ -630,7 +630,7 @@ export default function ScreenerPage() {
       {/* MASUKKAN SELURUH TAMPILAN JSX DASHBOARD KAMU DI SINI */}
     </div>
   );
-}
+
   function exportExcel() {
     const wb = XLSX.utils.book_new();
     const inputRows = [
@@ -697,7 +697,7 @@ export default function ScreenerPage() {
   ] : [];
 
   const scoreDonutData = CATEGORIES.map(c => ({ name: c, value: scoring.byCategory[c].sum })).filter(d => d.value > 0);
-}
+
   const gaugeColor = scoring.grade === "A+" || scoring.grade === "A" ? "#34d399" : scoring.grade === "B" ? "#a3e635" : scoring.grade === "C" ? "#facc15" : "#f87171";
 
   return (
@@ -745,7 +745,7 @@ export default function ScreenerPage() {
           </div>
         </div>
       </nav>
-      
+    
 
       <main className="max-w-7xl mx-auto px-4 py-6" id="print-report">
         {/* DASHBOARD */}
@@ -1246,4 +1246,5 @@ function NumberFieldText({ label, value, onChange }) {
       />
     </label>
   );
+}
 }
