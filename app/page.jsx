@@ -553,14 +553,9 @@ const NAV = [
 
 const PIE_COLORS = ["#34d399", "#10b981", "#059669", "#047857", "#065f46", "#a3e635"];
 
-/* ============================================================
-   MAIN APP
-   ============================================================ */
 export default function ScreenerPage() {
-  // 1. State Hydration (isMounted)
   const [isMounted, setIsMounted] = useState(false);
 
-  // 2. State Aplikasi & Input
   const [tab, setTab] = useState("dashboard");
   const [companyName, setCompanyName] = useState("");
   const [neraca, setNeraca] = useState(zeroNeraca);
