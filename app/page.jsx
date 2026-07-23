@@ -1,14 +1,36 @@
-
+// app/page.jsx
 'use client';
 
 import React, { useState, useMemo } from "react";
+import dynamic from "next/dynamic";
 import {
   LayoutDashboard, ClipboardEdit, BarChart3, Calculator, History,
   FileDown, FileSpreadsheet, TrendingUp, TrendingDown, AlertTriangle,
   CheckCircle2, XCircle, Info, Save, Minus, ChevronRight
 } from "lucide-react";
-// ... Lanjutan kode komponen App Anda ...
+import * as XLSX from "xlsx";
 
+// Dynamic Import untuk menonaktifkan SSR pada Recharts
+const ResponsiveContainer = dynamic(() => import("../components/Charts").then(m => m.ResponsiveContainer), { ssr: false });
+const RadarChart = dynamic(() => import("../components/Charts").then(m => m.RadarChart), { ssr: false });
+const PolarGrid = dynamic(() => import("../components/Charts").then(m => m.PolarGrid), { ssr: false });
+const PolarAngleAxis = dynamic(() => import("../components/Charts").then(m => m.PolarAngleAxis), { ssr: false });
+const PolarRadiusAxis = dynamic(() => import("../components/Charts").then(m => m.PolarRadiusAxis), { ssr: false });
+const Radar = dynamic(() => import("../components/Charts").then(m => m.Radar), { ssr: false });
+const PieChart = dynamic(() => import("../components/Charts").then(m => m.PieChart), { ssr: false });
+const Pie = dynamic(() => import("../components/Charts").then(m => m.Pie), { ssr: false });
+const Cell = dynamic(() => import("../components/Charts").then(m => m.Cell), { ssr: false });
+const BarChart = dynamic(() => import("../components/Charts").then(m => m.BarChart), { ssr: false });
+const Bar = dynamic(() => import("../components/Charts").then(m => m.Bar), { ssr: false });
+const XAxis = dynamic(() => import("../components/Charts").then(m => m.XAxis), { ssr: false });
+const YAxis = dynamic(() => import("../components/Charts").then(m => m.YAxis), { ssr: false });
+const CartesianGrid = dynamic(() => import("../components/Charts").then(m => m.CartesianGrid), { ssr: false });
+const Tooltip = dynamic(() => import("../components/Charts").then(m => m.Tooltip), { ssr: false });
+const RadialBarChart = dynamic(() => import("../components/Charts").then(m => m.RadialBarChart), { ssr: false });
+const RadialBar = dynamic(() => import("../components/Charts").then(m => m.RadialBar), { ssr: false });
+const LineChart = dynamic(() => import("../components/Charts").then(m => m.LineChart), { ssr: false });
+const Line = dynamic(() => import("../components/Charts").then(m => m.Line), { ssr: false });
+const Legend = dynamic(() => import("../components/Charts").then(m => m.Legend), { ssr: false });
 import React, { useState, useMemo } from "react";
 import {
   LayoutDashboard, ClipboardEdit, BarChart3, Calculator, History,
@@ -21,6 +43,18 @@ import {
   Tooltip, RadialBarChart, RadialBar, LineChart, Line, Legend
 } from "recharts";
 import * as XLSX from "xlsx";
+
+// Di dalam komponen App() Anda:
+const [isMounted, setIsMounted] = useState(false);
+
+useEffect(() => {
+  setIsMounted(true);
+}, []);
+
+// Jika belum mounted (saat di-build Vercel / SSR), render placeholder dulu
+if (!isMounted) {
+  return <div className="min-h-screen bg-black text-white p-10">Loading Screener...</div>;
+}
 
 /* ============================================================
    TYPES (dijelaskan lewat komentar - versi Next.js pakai types/*.ts)
