@@ -69,11 +69,6 @@ useEffect(() => {
   setIsMounted(true);
 }, []);
 
-// Jika belum mounted (saat di-build Vercel / SSR), render placeholder dulu
-if (!isMounted) {
-  return <div className="min-h-screen bg-black text-white p-10">Loading Screener...</div>;
-}
-
 /* ============================================================
    TYPES (dijelaskan lewat komentar - versi Next.js pakai types/*.ts)
    NeracaInput, LabaRugiInput, PasarInput, PrevYearInput, ValuationParams
