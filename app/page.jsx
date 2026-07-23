@@ -1210,7 +1210,7 @@ export default function ScreenerPage() {
       </main>
     </div>
   );
-}
+
 
 function StatCard({ label, value, sub, color }) {
   return (
