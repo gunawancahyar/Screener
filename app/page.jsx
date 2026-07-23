@@ -1,70 +1,51 @@
-'use client';
+"use client";
 
-// 1. SEMUA IMPORT DI ATAS
 import React, { useState, useMemo, useEffect } from "react";
-import dynamic from "next/dynamic";
-import {
-  LayoutDashboard, ClipboardEdit, BarChart3, Calculator, History,
-  FileDown, FileSpreadsheet, TrendingUp, TrendingDown, AlertTriangle,
-  CheckCircle2, XCircle, Info, Save, Minus, ChevronRight
-} from "lucide-react";
-import * as XLSX from "xlsx";
 
-// Dynamic Import Recharts (Agar aman dari SSR)
-const ResponsiveContainer = dynamic(() => import("recharts").then(m => m.ResponsiveContainer), { ssr: false });
-const RadarChart = dynamic(() => import("recharts").then(m => m.RadarChart), { ssr: false });
-const PolarGrid = dynamic(() => import("recharts").then(m => m.PolarGrid), { ssr: false });
-const PolarAngleAxis = dynamic(() => import("recharts").then(m => m.PolarAngleAxis), { ssr: false });
-const PolarRadiusAxis = dynamic(() => import("recharts").then(m => m.PolarRadiusAxis), { ssr: false });
-const Radar = dynamic(() => import("recharts").then(m => m.Radar), { ssr: false });
-const PieChart = dynamic(() => import("recharts").then(m => m.PieChart), { ssr: false });
-const Pie = dynamic(() => import("recharts").then(m => m.Pie), { ssr: false });
-const Cell = dynamic(() => import("recharts").then(m => m.Cell), { ssr: false });
-const BarChart = dynamic(() => import("recharts").then(m => m.BarChart), { ssr: false });
-const Bar = dynamic(() => import("recharts").then(m => m.Bar), { ssr: false });
-const XAxis = dynamic(() => import("recharts").then(m => m.XAxis), { ssr: false });
-const YAxis = dynamic(() => import("recharts").then(m => m.YAxis), { ssr: false });
-const CartesianGrid = dynamic(() => import("recharts").then(m => m.CartesianGrid), { ssr: false });
-const Tooltip = dynamic(() => import("recharts").then(m => m.Tooltip), { ssr: false });
-const RadialBarChart = dynamic(() => import("recharts").then(m => m.RadialBarChart), { ssr: false });
-const RadialBar = dynamic(() => import("recharts").then(m => m.RadialBar), { ssr: false });
-const LineChart = dynamic(() => import("recharts").then(m => m.LineChart), { ssr: false });
-const Line = dynamic(() => import("recharts").then(m => m.Line), { ssr: false });
-const Legend = dynamic(() => import("recharts").then(m => m.Legend), { ssr: false });
+// ==========================================
+// 1. HELPER FUNCTIONS & CONSTANTS (Di luar komponen)
+// Taruh zeroNeraca, zeroLabaRugi, computeRatios, dll. di area ini
+// ==========================================
 
+export default function ScreenerPage() {
+  // A. STATE
+  const [isMounted, setIsMounted] = useState(false);
+  const [tab, setTab] = useState("dashboard");
+  const [companyName, setCompanyName] = useState("");
+  const [neraca, setNeraca] = useState(zeroNeraca);
+  const [lr, setLr] = useState(zeroLabaRugi);
+  const [pasar, setPasar] = useState({ hargaSaham: 0 });
+  const [prev, setPrev] = useState(zeroPrev);
+  const [params, setParams] = useState({
+    perTarget: 15,
+    pbvTarget: 2,
+    growth: 0.1,
+    discountRate: 0.12,
+    terminalGrowth: 0.03,
+  });
+  const [history, setHistory] = useState([]);
 
-// 2. MASUK KE DALAM KOMPONEN UTAMA
+  // B. SETTER HELPERS & USEMEMO
+  const setN = (k) => (v) => setNeraca((s) => ({ ...s, [k]: v }));
+  const setL = (k) => (v) => setLr((s) => ({ ...s, [k]: v }));
+  const setP = (k) => (v) => setPrev((s) => ({ ...s, [k]: v }));
+
+  const ratios = useMemo(() => computeRatios(neraca, lr, pasar), [neraca, lr, pasar]);
+  const scoring = useMemo(() => computeScoring(ratios), [ratios]);
+  const valuation = useMemo(() => computeValuation(ratios, lr, neraca, pasar, params), [ratios, lr, neraca, pasar, params]);
+  const altman = useMemo(() => computeAltmanZ(neraca, lr, pasar, ratios), [neraca, lr, pasar, ratios]);
+  const piotroski = useMemo(() => computePiotroski(neraca, lr, prev, ratios), [neraca, lr, prev, ratios]);
+  const cfq = useMemo(() => computeCashFlowQuality(prev, lr), [prev, lr]);
+  const redFlags = useMemo(() => detectRedFlags(neraca, lr, prev, ratios), [neraca, lr, prev, ratios]);
+  const invScore = useMemo(() => computeInvestmentScore(scoring, valuation, prev, lr, ratios), [scoring, valuation, prev, lr, ratios]);
+  const analysisText = useMemo(() => generateAnalysis(scoring, ratios, redFlags), [scoring, ratios, redFlags]);
+
+  const hasData = neraca.totalAset > 0 && lr.penjualan > 0;
+
+  // C. EFFECTS & HANDLERS
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
-  // State aplikasi Anda yang lain (contoh):
-  // const [activeTab, setActiveTab] = useState("dashboard");
-  // const [stocks, setStocks] = useState([...]);
-
-  // Pengecekan Mounted JUGA DI DALAM FUNGSI SINI (sebelum return JSX utama)
-  if (!isMounted) {
-    return (
-      <div className="min-h-screen bg-zinc-950 text-emerald-400 flex items-center justify-center font-mono">
-        Loading Fundamental Screener...
-      </div>
-    );
-  
-
-  // JSX Utama Komponen Anda
-  return (
-    <div className="min-h-screen bg-zinc-950 text-white p-6">
-      {/* Seluruh Tampilan Dashboard / Screener Anda */}
-    </div>
-  );
-}
-// Di dalam komponen App() Anda:
-const [isMounted, setIsMounted] = useState(false);
-
-useEffect(() => {
-  setIsMounted(true);
-}, []);
-
 /* ============================================================
    TYPES (dijelaskan lewat komentar - versi Next.js pakai types/*.ts)
    NeracaInput, LabaRugiInput, PasarInput, PrevYearInput, ValuationParams
@@ -635,6 +616,23 @@ export default function ScreenerPage() {
       ...h,
     ]);
   }
+
+  // D. HYDRATION GUARD
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen bg-zinc-950 text-emerald-400 flex items-center justify-center font-mono">
+        Loading Fundamental Screener...
+      </div>
+    );
+  }
+
+  // E. JSX TAMPILAN UTAMA
+  return (
+    <div className="min-h-screen bg-zinc-950 text-white p-6">
+      {/* MASUKKAN SELURUH TAMPILAN JSX DASHBOARD KAMU DI SINI */}
+    </div>
+  );
+}
   function exportExcel() {
     const wb = XLSX.utils.book_new();
     const inputRows = [
