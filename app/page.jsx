@@ -550,12 +550,15 @@ const NAV = [
   { id: "valuasi", label: "Valuasi", icon: Calculator },
   { id: "riwayat", label: "Riwayat Analisa", icon: History },
 ];
-      }
+}
 const PIE_COLORS = ["#34d399", "#10b981", "#059669", "#047857", "#065f46", "#a3e635"];
 
+
 export default function ScreenerPage() {
+  // 1. State Hydration (isMounted)
   const [isMounted, setIsMounted] = useState(false);
 
+  // 2. State Aplikasi & Input
   const [tab, setTab] = useState("dashboard");
   const [companyName, setCompanyName] = useState("");
   const [neraca, setNeraca] = useState(zeroNeraca);
@@ -742,6 +745,7 @@ export default function ScreenerPage() {
           </div>
         </div>
       </nav>
+      
 
       <main className="max-w-7xl mx-auto px-4 py-6" id="print-report">
         {/* DASHBOARD */}
@@ -1206,6 +1210,7 @@ export default function ScreenerPage() {
     </div>
   );
 
+  
 
 function StatCard({ label, value, sub, color }) {
   return (
