@@ -613,7 +613,7 @@ export default function ScreenerPage() {
       },
       ...h,
     ]);
-  }
+  
 
   // D. HYDRATION GUARD
   if (!isMounted) {
@@ -697,7 +697,7 @@ export default function ScreenerPage() {
   ] : [];
 
   const scoreDonutData = CATEGORIES.map(c => ({ name: c, value: scoring.byCategory[c].sum })).filter(d => d.value > 0);
-
+}
   const gaugeColor = scoring.grade === "A+" || scoring.grade === "A" ? "#34d399" : scoring.grade === "B" ? "#a3e635" : scoring.grade === "C" ? "#facc15" : "#f87171";
 
   return (
