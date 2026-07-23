@@ -49,7 +49,7 @@ const Legend = dynamic(() => import("recharts").then(m => m.Legend), { ssr: fals
         Loading Fundamental Screener...
       </div>
     );
-  }
+  
 
   // JSX Utama Komponen Anda
   return (
