@@ -34,10 +34,6 @@ const Legend = dynamic(() => import("recharts").then(m => m.Legend), { ssr: fals
 
 
 // 2. MASUK KE DALAM KOMPONEN UTAMA
-export default function ScreenerPage() {
-  // Masukkan useState isMounted DI DALAM FUNGSI SINI
-  const [isMounted, setIsMounted] = useState(false);
-
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -579,20 +575,32 @@ const PIE_COLORS = ["#34d399", "#10b981", "#059669", "#047857", "#065f46", "#a3e
 /* ============================================================
    MAIN APP
    ============================================================ */
-export default function App() {
+export default function ScreenerPage() {
+  // 1. State Hydration (isMounted)
+  const [isMounted, setIsMounted] = useState(false);
+
+  // 2. State Aplikasi & Input
   const [tab, setTab] = useState("dashboard");
   const [companyName, setCompanyName] = useState("");
   const [neraca, setNeraca] = useState(zeroNeraca);
   const [lr, setLr] = useState(zeroLabaRugi);
   const [pasar, setPasar] = useState({ hargaSaham: 0 });
   const [prev, setPrev] = useState(zeroPrev);
-  const [params, setParams] = useState({ perTarget: 15, pbvTarget: 2, growth: 0.1, discountRate: 0.12, terminalGrowth: 0.03 });
+  const [params, setParams] = useState({
+    perTarget: 15,
+    pbvTarget: 2,
+    growth: 0.1,
+    discountRate: 0.12,
+    terminalGrowth: 0.03,
+  });
   const [history, setHistory] = useState([]);
 
-  const setN = (k) => (v) => setNeraca(s => ({ ...s, [k]: v }));
-  const setL = (k) => (v) => setLr(s => ({ ...s, [k]: v }));
-  const setP = (k) => (v) => setPrev(s => ({ ...s, [k]: v }));
+  // 3. Helper Setter
+  const setN = (k) => (v) => setNeraca((s) => ({ ...s, [k]: v }));
+  const setL = (k) => (v) => setLr((s) => ({ ...s, [k]: v }));
+  const setP = (k) => (v) => setPrev((s) => ({ ...s, [k]: v }));
 
+  // 4. Calculations (useMemo)
   const ratios = useMemo(() => computeRatios(neraca, lr, pasar), [neraca, lr, pasar]);
   const scoring = useMemo(() => computeScoring(ratios), [ratios]);
   const valuation = useMemo(() => computeValuation(ratios, lr, neraca, pasar, params), [ratios, lr, neraca, pasar, params]);
@@ -605,15 +613,28 @@ export default function App() {
 
   const hasData = neraca.totalAset > 0 && lr.penjualan > 0;
 
+  // 5. Hydration Effect
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // 6. Functions
   function saveToHistory() {
-    setHistory(h => [
-      { id: Date.now(), name: companyName || `Analisa #${h.length + 1}`, date: new Date().toLocaleString("id-ID"),
-        grade: scoring.grade, pct: scoring.pct, avgFair: valuation.avgFair, harga: pasar.hargaSaham,
-        verdict: valuation.verdict, recommendation: invScore.recommendation },
+    setHistory((h) => [
+      {
+        id: Date.now(),
+        name: companyName || `Analisa #${h.length + 1}`,
+        date: new Date().toLocaleString("id-ID"),
+        grade: scoring.grade,
+        pct: scoring.pct,
+        avgFair: valuation.avgFair,
+        harga: pasar.hargaSaham,
+        verdict: valuation.verdict,
+        recommendation: invScore.recommendation,
+      },
       ...h,
     ]);
   }
-
   function exportExcel() {
     const wb = XLSX.utils.book_new();
     const inputRows = [
